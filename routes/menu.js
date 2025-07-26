@@ -1,32 +1,31 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const FoodItem = require('../models/FoodItem');
+const FoodItem = require("../models/FoodItem");
 
-// Get menu by shopID
-router.get('/:shopID', async (req, res) => {
-  const menu = await FoodItem.find({ shopID: req.params.shopID });
-  res.json(menu);
+// GET menu for shop
+router.get("/:shopID", async (req, res) => {
+  const { shopID } = req.params;
+  const items = await FoodItem.find({ shopID });
+  res.json(items);
 });
 
-// Add new item
-router.post('/', async (req, res) => {
-  const { name, price, count, shopID } = req.body;
-  const newItem = new FoodItem({ name, price, count, shopID, available: true });
-  await newItem.save();
-  res.sendStatus(201);
+// POST add food item
+router.post("/", async (req, res) => {
+  const item = new FoodItem(req.body);
+  await item.save();
+  res.json(item);
 });
 
-// Delete item
-router.delete('/:id', async (req, res) => {
+// PUT update item
+router.put("/:id", async (req, res) => {
+  const updated = await FoodItem.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  res.json(updated);
+});
+
+// DELETE item
+router.delete("/:id", async (req, res) => {
   await FoodItem.findByIdAndDelete(req.params.id);
-  res.sendStatus(204);
-});
-
-// Update item
-router.put('/:id', async (req, res) => {
-  const { name, price, count } = req.body;
-  await FoodItem.findByIdAndUpdate(req.params.id, { name, price, count });
-  res.sendStatus(200);
+  res.json({ message: "Item deleted" });
 });
 
 module.exports = router;
