@@ -1,38 +1,26 @@
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
-const dotenv = require("dotenv");
 const cors = require("cors");
 
 const menuRoutes = require("./routes/menu");
-
-dotenv.config();
+const shopRoutes = require("./routes/shop");
 
 const app = express();
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
 
-// Routes
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+}).then(() => console.log("Connected to MongoDB"))
+  .catch(err => console.error("MongoDB connection error:", err));
+
 app.use("/api/menu", menuRoutes);
+app.use("/api/shop", shopRoutes);
 
-// MongoDB Connection
-async function connectDB() {
-  try {
-    await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log("✅ MongoDB connected");
-
-    // Start server **only after DB is connected**
-    app.listen(PORT, () => {
-      console.log(`✅ Backend running on http://localhost:${PORT}`);
-    });
-  } catch (err) {
-    console.error("❌ MongoDB connection error:", err.message);
-    process.exit(1);
-  }
-}
-
-connectDB();
+app.listen(PORT, () => {
+  console.log(`Backend running on http://localhost:${PORT}`);
+});
