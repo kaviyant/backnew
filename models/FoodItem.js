@@ -1,11 +1,10 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const foodItemSchema = new mongoose.Schema({
+const FoodItemSchema = new mongoose.Schema({
   name: String,
   price: Number,
   count: Number,
-  available: { type: Boolean, default: true },
   shopID: String
 });
 
-module.exports = mongoose.model('FoodItem', foodItemSchema);
+module.exports = mongoose.model("FoodItem", FoodItemSchema);
