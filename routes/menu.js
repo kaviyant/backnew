@@ -1,37 +1,32 @@
 const express = require("express");
 const router = express.Router();
-const Shop = require("../models/Shop");
+const FoodItem = require("../models/FoodItem");
 
-// Get menu for a shop
-router.get("/menu", async (req, res) => {
-  const { shopID } = req.query;
-  if (!shopID) return res.status(400).json({ error: "shopID required" });
-
-  const shop = await Shop.findOne({ shopID });
-  if (!shop) return res.status(404).json({ error: "Shop not found" });
-
-  res.json(shop.menu);
+// GET menu by shop ID
+router.get("/:shopID", async (req, res) => {
+  const items = await FoodItem.find({ shopID: req.params.shopID });
+  res.json(items);
 });
 
-// Add or update item in a shop menu
-router.post("/menu", async (req, res) => {
-  const { shopID, item } = req.body;
-  if (!shopID || !item) return res.status(400).json({ error: "Invalid data" });
+// POST new menu item
+router.post("/", async (req, res) => {
+  const { name, price, count, shopID } = req.body;
+  const item = new FoodItem({ name, price, count, shopID });
+  await item.save();
+  res.json({ success: true });
+});
 
-  let shop = await Shop.findOne({ shopID });
-  if (!shop) {
-    shop = new Shop({ shopID, menu: [item] });
-  } else {
-    const index = shop.menu.findIndex((i) => i.name === item.name);
-    if (index !== -1) {
-      shop.menu[index] = item; // update
-    } else {
-      shop.menu.push(item); // add
-    }
-  }
+// PUT update menu item
+router.put("/:id", async (req, res) => {
+  const { name, price, count } = req.body;
+  await FoodItem.findByIdAndUpdate(req.params.id, { name, price, count });
+  res.json({ success: true });
+});
 
-  await shop.save();
-  res.json({ success: true, menu: shop.menu });
+// DELETE item
+router.delete("/:id", async (req, res) => {
+  await FoodItem.findByIdAndDelete(req.params.id);
+  res.json({ success: true });
 });
 
 module.exports = router;
