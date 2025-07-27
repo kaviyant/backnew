@@ -9,7 +9,11 @@ const shopRoutes = require("./routes/shop");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+// ✅ CORS should allow only your frontend domain:
+app.use(cors({
+  origin: "https://kaviyant.github.io"
+}));
+
 app.use(express.json());
 
 mongoose.connect(process.env.MONGODB_URI, {
@@ -17,6 +21,11 @@ mongoose.connect(process.env.MONGODB_URI, {
   useUnifiedTopology: true
 }).then(() => console.log("Connected to MongoDB"))
   .catch(err => console.error("MongoDB connection error:", err));
+
+// ✅ Optional: Add a homepage route so "Cannot GET /" is fixed:
+app.get("/", (req, res) => {
+  res.send("QR Menu Backend is live 🎉");
+});
 
 app.use("/api/menu", menuRoutes);
 app.use("/api/shop", shopRoutes);
