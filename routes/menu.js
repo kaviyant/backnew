@@ -3,10 +3,15 @@ const router = express.Router();
 const FoodItem = require("../models/FoodItem");
 
 // GET menu by shop ID
-router.get("/:shopID", async (req, res) => {
-  const items = await FoodItem.find({ shopID: req.params.shopID });
+// GET menu for a shop
+router.get("/", async (req, res) => {
+  const { shopID } = req.query;
+  if (!shopID) return res.status(400).json({ error: "shopID required" });
+
+  const items = await FoodItem.find({ shopID });
   res.json(items);
 });
+
 
 // POST new menu item
 router.post("/", async (req, res) => {
