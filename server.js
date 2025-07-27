@@ -28,7 +28,7 @@ app.get("/", (req, res) => {
 // ⬇️ ADD THIS NEW ROUTE BELOW 👇
 app.get("/qr", (req, res) => {
   const shopID = req.query.shop;
-  const customerURL = `https://kaviyant.github.io/scan.html?shop=${shopID}`;
+  const customerURL = `https://kaviyant.github.io/fronnew/scan.html?shop=${shopID}`;
   const qrAPI = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(customerURL)}&size=200x200`;
   res.redirect(qrAPI);
 });
