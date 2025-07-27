@@ -5,7 +5,6 @@ const cors = require("cors");
 
 const menuRoutes = require("./routes/menu");
 const shopRoutes = require("./routes/shop");
-const qrRoutes = require("./routes/qr"); // ✅ Step 4
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -26,9 +25,17 @@ app.get("/", (req, res) => {
   res.send("QR Menu Backend is live 🎉");
 });
 
+// ⬇️ ADD THIS NEW ROUTE BELOW 👇
+app.get("/qr", (req, res) => {
+  const shopID = req.query.shop;
+  const customerURL = `https://kaviyant.github.io/scan.html?shop=${shopID}`;
+  const qrAPI = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(customerURL)}&size=200x200`;
+  res.redirect(qrAPI);
+});
+// ⬆️ END OF NEW ROUTE
+
 app.use("/api/menu", menuRoutes);
 app.use("/api/shop", shopRoutes);
-app.use("/qr", qrRoutes); // ✅ Step 4
 
 app.listen(PORT, () => {
   console.log(`Backend running on http://localhost:${PORT}`);
