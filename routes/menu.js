@@ -2,36 +2,62 @@ const express = require("express");
 const router = express.Router();
 const FoodItem = require("../models/FoodItem");
 
-// GET menu by shop ID
-// GET menu for a shop
+// ✅ GET menu items for a shop using query param ?shopID=xxx
 router.get("/", async (req, res) => {
   const { shopID } = req.query;
-  if (!shopID) return res.status(400).json({ error: "shopID required" });
+  if (!shopID) {
+    return res.status(400).json({ error: "shopID is required" });
+  }
 
-  const items = await FoodItem.find({ shopID });
-  res.json(items);
+  try {
+    const items = await FoodItem.find({ shopID });
+    res.json(items);
+  } catch (err) {
+    console.error("Error fetching menu:", err);
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
-
-// POST new menu item
+// ✅ POST a new menu item
 router.post("/", async (req, res) => {
   const { name, price, count, shopID } = req.body;
-  const item = new FoodItem({ name, price, count, shopID });
-  await item.save();
-  res.json({ success: true });
+
+  if (!name || !price || !count || !shopID) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  try {
+    const item = new FoodItem({ name, price, count, shopID });
+    await item.save();
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Error saving item:", err);
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
-// PUT update menu item
+// ✅ PUT to update an item by its ID
 router.put("/:id", async (req, res) => {
   const { name, price, count } = req.body;
-  await FoodItem.findByIdAndUpdate(req.params.id, { name, price, count });
-  res.json({ success: true });
+
+  try {
+    await FoodItem.findByIdAndUpdate(req.params.id, { name, price, count });
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Error updating item:", err);
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
-// DELETE item
+// ✅ DELETE an item by its ID
 router.delete("/:id", async (req, res) => {
-  await FoodItem.findByIdAndDelete(req.params.id);
-  res.json({ success: true });
+  try {
+    await FoodItem.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Error deleting item:", err);
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 module.exports = router;
